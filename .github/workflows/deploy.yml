@@ -1,9 +1,8 @@
-name: Deploy Axon to GitHub Pages
+name: Deploy Axon
 
 on:
   push:
-    branches:
-      - main
+    branches: ["main"]
     paths-ignore:
       - 'README.md'
       - 'GITHUB_PAGES.md'
@@ -19,20 +18,63 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
-          # The following files and directories will be excluded from the deployment
-          exclude_assets: |
-            .github/
-            README.md
-            GITHUB_PAGES.md
-            server.js
-            database/
-            scripts/
-            node_modules/
+        run: |
+          set -e # Exit immediately if a command exits with a non-zero status.
+          
+          echo "🚀 Starting deployment..."
+          
+          # Use a temporary directory for the clone
+          CLONE_DIR=$(mktemp -d)
+          
+          # Clone the repository
+          git clone "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" "$CLONE_DIR"
+          cd "$CLONE_DIR"
+          
+          echo "📁 Repository cloned successfully"
+          
+          # Create a temporary directory for the site content
+          SITE_DIR=$(mktemp -d)
+          
+          # Copy static files to the site directory
+          echo "📋 Copying files..."
+          cp index.html "$SITE_DIR/"
+          # Check if 'public' directory exists before copying
+          if [ -d "public" ]; then
+            cp -r public "$SITE_DIR/"
+          else
+            echo "ℹ️ No 'public' directory found, skipping."
+          fi
+          
+          # Switch to or create the gh-pages branch
+          echo "🌿 Setting up gh-pages branch..."
+          git checkout --orphan gh-pages-temp
+          
+          # Clear the temporary branch
+          echo "🧹 Clearing old content..."
+          git rm -rf .
+          
+          # Copy new content from the site directory
+          echo "📦 Deploying new content..."
+          cp -r "$SITE_DIR"/* .
+          
+          # Configure git
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          
+          # Add all files
+          git add -A
+          
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "✅ No changes to deploy"
+          else
+            # Commit and push
+            git commit -m "🚀 Deploy from main branch - $(date)"
+            echo "📤 Pushing to gh-pages..."
+            # Force push to the actual gh-pages branch
+            git push --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:gh-pages
+            echo "✅ Deployment completed successfully!"
+          fi
+          
+          echo "🌐 Site will be available at: https://${{ github.repository_owner }}.github.io/axon/"
