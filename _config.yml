@@ -1,0 +1,58 @@
+# Jekyll Configuration for Axon Project
+title: "Axon - Generador de Iconos Clickeables"
+description: "Convierte URLs en iconos clickeables con diseño profesional y fondo estrellado animado"
+url: "https://papiweb-desarrollos.github.io"
+baseurl: "/axon"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+
+# Collections
+collections:
+  icons:
+    output: false
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Exclude from processing
+exclude:
+  - node_modules/
+  - package*.json
+  - server.js
+  - database/
+  - scripts/
+  - axon.html
+  - .git/
+  - .github/
+  - README.md
+  - GITHUB_PAGES.md
+
+# Include files
+include:
+  - _redirects
+
+# Sass settings
+sass:
+  style: compressed
+
+# SEO settings
+author: "Papiweb desarrollos informáticos"
+twitter:
+  username: papiweb
+social:
+  name: Papiweb desarrollos informáticos
+  links:
+    - https://github.com/papiweb-desarrollos
+
+# Default layout
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"
