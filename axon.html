@@ -343,6 +343,14 @@
             font-size: 0.8em;
         }
 
+        .download-btn {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+        }
+
         /* Estilos para iconos guardados */
         .saved-icon-item {
             display: flex;
@@ -561,6 +569,8 @@
         <div id="actionButtons" style="display: none; margin-top: 15px;">
             <button id="saveIconBtn" class="action-btn save-btn">💾 Guardar Icono</button>
             <button id="loadIconsBtn" class="action-btn load-btn">📋 Ver Mis Iconos</button>
+            <button id="downloadBtn" class="action-btn download-btn">📥 Descargar HTML</button>
+            <button id="copyBtn" class="action-btn copy-btn">📋 Copiar Código</button>
         </div>
     </div>
 
@@ -682,6 +692,8 @@
             const actionButtons = document.getElementById('actionButtons');
             const saveIconBtn = document.getElementById('saveIconBtn');
             const loadIconsBtn = document.getElementById('loadIconsBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const copyBtn = document.getElementById('copyBtn');
             const savedIconsPanel = document.getElementById('savedIconsPanel');
             const savedIconsList = document.getElementById('savedIconsList');
             const statsContent = document.getElementById('statsContent');
@@ -864,6 +876,175 @@
                 }
             };
 
+            // Función para generar el código HTML completo del icono
+            function generateIconHTML(url, title, iconStyle, iconSvg) {
+                return `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title || 'Icono Clickeable'}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        .icon-container {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .generated-icon-link {
+            display: inline-block;
+            padding: 20px;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin: 20px;
+        }
+        
+        .generated-icon-link svg {
+            display: block;
+            width: 80px;
+            height: 80px;
+            fill: #ffffff;
+        }
+        
+        .generated-icon-link:hover {
+            transform: scale(1.15);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        /* Estilos específicos para cada icono */
+        .icon-style-link {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+        }
+        .icon-style-web {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+        }
+        .icon-style-star {
+            background: linear-gradient(135deg, #FFC107, #FFA000);
+        }
+        .icon-style-download {
+            background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .url-info {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            word-break: break-all;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            color: #888;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="icon-container">
+        <h1>${title || 'Icono Clickeable'}</h1>
+        <div class="url-info">Destino: ${url}</div>
+        
+        <a href="${url}" target="_blank" rel="noopener noreferrer" 
+           class="generated-icon-link icon-style-${iconStyle}"
+           title="${title || url}">
+            ${iconSvg}
+        </a>
+        
+        <div class="footer">
+            Generado con Axon - Papiweb desarrollos informáticos
+        </div>
+    </div>
+</body>
+</html>`;
+            }
+
+            // Función para descargar archivo
+            function downloadIcon() {
+                if (!currentGeneratedIcon) return;
+                
+                const htmlContent = generateIconHTML(
+                    currentGeneratedIcon.url,
+                    currentGeneratedIcon.title,
+                    currentGeneratedIcon.iconStyle,
+                    currentGeneratedIcon.iconSvg
+                );
+                
+                const blob = new Blob([htmlContent], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                
+                const filename = currentGeneratedIcon.title 
+                    ? `icono-${currentGeneratedIcon.title.replace(/[^a-zA-Z0-9]/g, '-')}.html`
+                    : `icono-${new Date().getTime()}.html`;
+                
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                // Feedback visual
+                downloadBtn.textContent = '✅ Descargado';
+                setTimeout(() => {
+                    downloadBtn.textContent = '📥 Descargar HTML';
+                }, 2000);
+            }
+
+            // Función para copiar código HTML
+            async function copyIconCode() {
+                if (!currentGeneratedIcon) return;
+                
+                const htmlContent = generateIconHTML(
+                    currentGeneratedIcon.url,
+                    currentGeneratedIcon.title,
+                    currentGeneratedIcon.iconStyle,
+                    currentGeneratedIcon.iconSvg
+                );
+                
+                try {
+                    await navigator.clipboard.writeText(htmlContent);
+                    copyBtn.textContent = '✅ Copiado';
+                    setTimeout(() => {
+                        copyBtn.textContent = '📋 Copiar Código';
+                    }, 2000);
+                } catch (err) {
+                    // Fallback para navegadores que no soportan clipboard API
+                    const textArea = document.createElement('textarea');
+                    textArea.value = htmlContent;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    copyBtn.textContent = '✅ Copiado';
+                    setTimeout(() => {
+                        copyBtn.textContent = '📋 Copiar Código';
+                    }, 2000);
+                }
+            }
+
             // Cargar y mostrar iconos guardados
             async function loadAndDisplaySavedIcons() {
                 savedIconsList.innerHTML = '<p class="loading">Cargando iconos...</p>';
@@ -973,6 +1154,10 @@
                     loadIconsBtn.textContent = '📋 Ver Mis Iconos';
                 }
             });
+
+            // Event listeners para nuevos botones
+            downloadBtn.addEventListener('click', downloadIcon);
+            copyBtn.addEventListener('click', copyIconCode);
         });
     </script>
 

@@ -363,6 +363,40 @@
             color: white;
         }
 
+        /* Botones de acción para iconos */
+        .action-buttons {
+            display: none;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+        }
+
         /* Footer */
         .footer {
             background: linear-gradient(135deg, rgba(26, 115, 232, 0.9), rgba(13, 71, 161, 0.9));
@@ -504,6 +538,12 @@
             <span style="color: #888;">El icono generado aparecerá aquí</span>
         </div>
 
+        <!-- Botones de acción -->
+        <div id="actionButtons" class="action-buttons">
+            <button id="downloadBtn" class="action-btn download-btn">📥 Descargar HTML</button>
+            <button id="copyBtn" class="action-btn copy-btn">📋 Copiar Código</button>
+        </div>
+
         <div class="github-info">
             <h3>📡 Versión GitHub Pages</h3>
             <p>Esta es la versión estática desplegada automáticamente. Para la versión completa con backend y almacenamiento persistente, visita el repositorio.</p>
@@ -631,9 +671,13 @@
             const generateBtn = document.getElementById('generateBtn');
             const outputArea = document.getElementById('outputArea');
             const iconOptions = document.querySelectorAll('.icon-option');
+            const actionButtons = document.getElementById('actionButtons');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const copyBtn = document.getElementById('copyBtn');
             
             let selectedIconStyle = 'web'; // Estilo por defecto
             let selectedIconSVG = iconOptions[1].querySelector('svg').outerHTML; // SVG del estilo por defecto
+            let currentIconData = null;
 
             // Manejar selección de icono
             iconOptions.forEach(option => {
@@ -644,6 +688,175 @@
                     selectedIconSVG = this.querySelector('svg').outerHTML;
                 });
             });
+
+            // Función para generar el código HTML completo del icono
+            function generateIconHTML(url, title, iconStyle, iconSvg) {
+                return `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title || 'Icono Clickeable'}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        .icon-container {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .generated-icon-link {
+            display: inline-block;
+            padding: 20px;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin: 20px;
+        }
+        
+        .generated-icon-link svg {
+            display: block;
+            width: 80px;
+            height: 80px;
+            fill: #ffffff;
+        }
+        
+        .generated-icon-link:hover {
+            transform: scale(1.15);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        /* Estilos específicos para cada icono */
+        .icon-style-link {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+        }
+        .icon-style-web {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+        }
+        .icon-style-star {
+            background: linear-gradient(135deg, #FFC107, #FFA000);
+        }
+        .icon-style-download {
+            background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .url-info {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            word-break: break-all;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            color: #888;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="icon-container">
+        <h1>${title || 'Icono Clickeable'}</h1>
+        <div class="url-info">Destino: ${url}</div>
+        
+        <a href="${url}" target="_blank" rel="noopener noreferrer" 
+           class="generated-icon-link icon-style-${iconStyle}"
+           title="${title || url}">
+            ${iconSvg}
+        </a>
+        
+        <div class="footer">
+            Generado con Axon - Papiweb desarrollos informáticos
+        </div>
+    </div>
+</body>
+</html>`;
+            }
+
+            // Función para descargar archivo
+            function downloadIcon() {
+                if (!currentIconData) return;
+                
+                const htmlContent = generateIconHTML(
+                    currentIconData.url,
+                    currentIconData.title,
+                    currentIconData.iconStyle,
+                    currentIconData.iconSvg
+                );
+                
+                const blob = new Blob([htmlContent], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                
+                const filename = currentIconData.title 
+                    ? `icono-${currentIconData.title.replace(/[^a-zA-Z0-9]/g, '-')}.html`
+                    : `icono-${new Date().getTime()}.html`;
+                
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                // Feedback visual
+                downloadBtn.textContent = '✅ Descargado';
+                setTimeout(() => {
+                    downloadBtn.textContent = '📥 Descargar HTML';
+                }, 2000);
+            }
+
+            // Función para copiar código HTML
+            async function copyIconCode() {
+                if (!currentIconData) return;
+                
+                const htmlContent = generateIconHTML(
+                    currentIconData.url,
+                    currentIconData.title,
+                    currentIconData.iconStyle,
+                    currentIconData.iconSvg
+                );
+                
+                try {
+                    await navigator.clipboard.writeText(htmlContent);
+                    copyBtn.textContent = '✅ Copiado';
+                    setTimeout(() => {
+                        copyBtn.textContent = '📋 Copiar Código';
+                    }, 2000);
+                } catch (err) {
+                    // Fallback para navegadores que no soportan clipboard API
+                    const textArea = document.createElement('textarea');
+                    textArea.value = htmlContent;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    copyBtn.textContent = '✅ Copiado';
+                    setTimeout(() => {
+                        copyBtn.textContent = '📋 Copiar Código';
+                    }, 2000);
+                }
+            }
 
             // Generar icono
             generateBtn.addEventListener('click', function() {
@@ -684,6 +897,17 @@
                 
                 outputArea.appendChild(iconLink);
 
+                // Guardar datos del icono actual para descarga
+                currentIconData = {
+                    url: url,
+                    title: title,
+                    iconStyle: selectedIconStyle,
+                    iconSvg: selectedIconSVG
+                };
+
+                // Mostrar botones de acción
+                actionButtons.style.display = 'block';
+
                 // Mostrar mensaje de éxito
                 const successMsg = document.createElement('div');
                 successMsg.style.cssText = `
@@ -706,6 +930,10 @@
                     }
                 }, 3000);
             });
+
+            // Event listeners para botones de acción
+            downloadBtn.addEventListener('click', downloadIcon);
+            copyBtn.addEventListener('click', copyIconCode);
         });
     </script>
 
