@@ -14,41 +14,57 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js (if needed)
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
-          force_orphan: true
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_message: ${{ github.event.head_commit.message }}
-          # The following files and directories will be excluded from the deployment
-          exclude_assets: |
-            .github/
-            README.md
-            GITHUB_PAGES.md
-            server.js
-            database/
-            scripts/
-            node_modules/
-            package*.json
-            _config.yml
-            setup.html
+        run: |
+          echo "🚀 Starting deployment process..."
+          
+          # Configure git for the action
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          
+          # Clone the repository
+          echo "📥 Cloning repository..."
+          git clone --depth=1 https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git repo
+          cd repo
+          
+          echo "📁 Repository cloned successfully"
+          
+          # Create deployment directory
+          mkdir -p ../deploy
+          
+          # Copy only the necessary files for deployment
+          echo "📋 Copying deployment files..."
+          cp index.html ../deploy/
+          [ -d public ] && cp -r public ../deploy/ || echo "ℹ️ No public directory found"
+          
+          # List what we're deploying
+          echo "📦 Files to deploy:"
+          ls -la ../deploy/
+          
+          # Switch to deployment directory
+          cd ../deploy
+          
+          # Initialize git in deployment directory
+          git init
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+          # Add all files
+          git add -A
+          
+          # Create initial commit
+          git commit -m "🚀 Deploy Axon to GitHub Pages - $(date)"
+          
+          # Add remote and push to gh-pages branch
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          
+          echo "📤 Pushing to gh-pages branch..."
+          git push -f origin HEAD:gh-pages
+          
+          echo "✅ Deployment completed successfully!"
+          echo "🌐 Site will be available at: https://${{ github.repository_owner }}.github.io/axon/"
