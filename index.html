@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axon - Generador de Iconos Clickeables</title>
+    <meta name="description" content="Convierte URLs en iconos clickeables con diseño profesional y fondo estrellado animado">
+    <meta name="keywords" content="iconos, url, enlaces, generador, github pages">
+    <meta name="author" content="Papiweb desarrollos informáticos">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://papiweb-desarrollos.github.io/axon/">
+    <meta property="og:title" content="Axon - Generador de Iconos Clickeables">
+    <meta property="og:description" content="Convierte URLs en iconos clickeables con diseño profesional">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://papiweb-desarrollos.github.io/axon/">
+    <meta property="twitter:title" content="Axon - Generador de Iconos Clickeables">
+    <meta property="twitter:description" content="Convierte URLs en iconos clickeables con diseño profesional">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="public/tazapapiweb.ico">
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 25%, #2d3748 50%, #1a2332 75%, #0f1419 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animación del fondo degradado */
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Contenedor de estrellas */
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Estrellas pequeñas */
+        .star {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle 3s infinite;
+        }
+
+        .star.small {
+            width: 2px;
+            height: 2px;
+            animation-duration: 3s;
+        }
+
+        .star.medium {
+            width: 3px;
+            height: 3px;
+            animation-duration: 4s;
+            box-shadow: 0 0 6px #ffffff;
+        }
+
+        .star.large {
+            width: 4px;
+            height: 4px;
+            animation-duration: 5s;
+            box-shadow: 0 0 8px #ffffff, 0 0 12px #4299ff;
+        }
+
+        /* Estrellas brillantes especiales */
+        .bright-star {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, #ffffff 0%, #4299ff 70%, transparent 100%);
+            border-radius: 50%;
+            opacity: 0;
+            animation: brightTwinkle 6s infinite;
+            box-shadow: 
+                0 0 10px #ffffff,
+                0 0 20px #4299ff,
+                0 0 30px #4299ff;
+        }
+
+        /* Animaciones de parpadeo */
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        @keyframes brightTwinkle {
+            0%, 100% { opacity: 0; transform: scale(1) rotate(0deg); }
+            25% { opacity: 0.3; transform: scale(1.1) rotate(90deg); }
+            50% { opacity: 1; transform: scale(1.3) rotate(180deg); }
+            75% { opacity: 0.6; transform: scale(1.1) rotate(270deg); }
+        }
+
+        /* Efecto de nebulosa */
+        .nebula {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 80%, rgba(66, 153, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(138, 43, 226, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 40% 40%, rgba(75, 0, 130, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+            animation: nebulaFloat 30s ease-in-out infinite;
+        }
+
+        @keyframes nebulaFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(1deg); }
+            66% { transform: translateY(10px) rotate(-1deg); }
+        }
+
+        /* Meteoros ocasionales */
+        .meteor {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(45deg, #ffffff, #4299ff);
+            border-radius: 50%;
+            opacity: 0;
+            z-index: 2;
+        }
+
+        @keyframes meteorFall {
+            0% {
+                opacity: 1;
+                transform: translateX(0) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(300px) translateY(300px);
+            }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #333;
+            padding: 30px 40px;
+            border-radius: 16px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            width: 90%;
+            max-width: 550px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.8em;
+            color: #1a73e8;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.95em;
+            margin-bottom: 7px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="url"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="url"]:focus {
+            outline: none;
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+
+        .icon-selector {
+            margin-bottom: 25px;
+        }
+
+        .icon-selector h3 {
+            font-size: 1.1em;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .icon-options {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+        }
+
+        .icon-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+        }
+        
+        .icon-option:hover {
+            transform: translateY(-3px);
+            background-color: rgba(240, 240, 240, 0.7);
+        }
+        
+        .icon-option.selected {
+            border-color: #1a73e8;
+            background-color: rgba(232, 240, 254, 0.7);
+        }
+
+        .icon-option svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 5px;
+        }
+        
+        .icon-option span {
+            font-size: 0.8em;
+            color: #555;
+        }
+
+        button#generateBtn {
+            background: linear-gradient(135deg, #1a73e8, #0d47a1);
+            color: #ffffff;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            transition: background 0.3s ease, transform 0.2s ease;
+            margin-top: 10px;
+        }
+
+        button#generateBtn:hover {
+            background: linear-gradient(135deg, #0d47a1, #1a73e8);
+            transform: translateY(-2px);
+        }
+
+        #outputArea {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: rgba(249, 249, 249, 0.9);
+            border-radius: 8px;
+            min-height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px dashed #ccc;
+        }
+
+        .generated-icon-link {
+            display: inline-block;
+            padding: 15px;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .generated-icon-link svg {
+            display: block;
+            width: 50px;
+            height: 50px;
+            fill: #ffffff;
+        }
+
+        .generated-icon-link:hover {
+            transform: scale(1.15);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Estilos específicos para cada icono */
+        .icon-style-link {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+        }
+        .icon-style-web {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+        }
+        .icon-style-star {
+            background: linear-gradient(135deg, #FFC107, #FFA000);
+        }
+        .icon-style-download {
+             background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+        }
+
+        .github-info {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .github-info h3 {
+            color: #1a73e8;
+            margin-top: 0;
+        }
+
+        .github-info p {
+            margin: 10px 0;
+            color: #666;
+        }
+
+        .github-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #333, #555);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: transform 0.2s ease;
+            margin: 5px;
+        }
+
+        .github-link:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, rgba(26, 115, 232, 0.9), rgba(13, 71, 161, 0.9));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            border-radius: 16px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: none;
+            margin-left: 0;
+            margin-right: 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer p {
+            margin: 0;
+            font-size: 1em;
+            font-weight: 500;
+        }
+
+        .footer .company-name {
+            color: #ffffff;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .footer .divider {
+            margin: 0 8px;
+            opacity: 0.7;
+        }
+
+        .footer .year {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .footer-icon {
+            display: inline-block;
+            margin-left: 15px;
+            padding: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            vertical-align: middle;
+        }
+
+        .footer-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer-icon img {
+            width: 24px;
+            height: 24px;
+            filter: brightness(0) invert(1);
+        }
+
+        .footer-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .icon-options {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .icon-option {
+                flex: 1 1 45%;
+                min-width: 120px;
+            }
+            
+            .container {
+                width: 95%;
+                padding: 20px 25px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Contenedor de estrellas y nebulosa -->
+    <div class="stars-container" id="starsContainer"></div>
+    <div class="nebula"></div>
+
+    <div class="container">
+        <h1>🌟 Axon - Generador de Iconos</h1>
+
+        <div class="form-group">
+            <label for="targetUrl">URL de Destino:</label>
+            <input type="url" id="targetUrl" placeholder="Ej: https://www.ejemplo.com" required>
+        </div>
+
+        <div class="form-group">
+            <label for="linkTitle">Texto Descriptivo (opcional, para tooltip):</label>
+            <input type="text" id="linkTitle" placeholder="Ej: Visitar página principal">
+        </div>
+
+        <div class="icon-selector">
+            <h3>Elige un Estilo de Icono:</h3>
+            <div class="icon-options">
+                <div class="icon-option" data-style="link" data-icon-name="Enlace">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 7h-4v2h4c1.65 0 3 1.35 3 3s-1.35 3-3 3h-4v2h4c2.76 0 5-2.24 5-5s-2.24-5-5-5zm-6 8H7c-1.65 0-3-1.35-3-3s1.35-3 3-3h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-2zm-3-4h8v2H8v-2z"></path></svg>
+                    <span>Enlace</span>
+                </div>
+                <div class="icon-option selected" data-style="web" data-icon-name="Web">
+                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"></path></svg>
+                    <span>Web</span>
+                </div>
+                <div class="icon-option" data-style="star" data-icon-name="Estrella">
+                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27z"></path></svg>
+                    <span>Estrella</span>
+                </div>
+                 <div class="icon-option" data-style="download" data-icon-name="Descarga">
+                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"></path></svg>
+                    <span>Descarga</span>
+                </div>
+            </div>
+        </div>
+
+        <button id="generateBtn">Generar Icono-Enlace</button>
+
+        <div id="outputArea">
+            <span style="color: #888;">El icono generado aparecerá aquí</span>
+        </div>
+
+        <div class="github-info">
+            <h3>📡 Versión GitHub Pages</h3>
+            <p>Esta es la versión estática desplegada automáticamente. Para la versión completa con backend y almacenamiento persistente, visita el repositorio.</p>
+            <a href="https://github.com/papiweb-desarrollos/axon" target="_blank" class="github-link">
+                📂 Ver Código Fuente
+            </a>
+            <a href="https://github.com/papiweb-desarrollos/axon#readme" target="_blank" class="github-link">
+                📖 Documentación
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <p>
+                <span class="company-name">Papiweb desarrollos informáticos</span>
+                <span class="divider">•</span>
+                <span class="year">2025</span>
+            </p>
+            <a href="https://link.mercadopago.com.ar/papiweb" target="_blank" rel="noopener noreferrer" class="footer-icon" title="Apoyar en MercadoPago">
+                <img src="public/tazapapiweb.ico" alt="Taza Papiweb">
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Función para crear el fondo estrellado
+        function createStarField() {
+            const starsContainer = document.getElementById('starsContainer');
+            
+            // Limpiar estrellas existentes
+            starsContainer.innerHTML = '';
+            
+            // Crear estrellas normales
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // Determinar tamaño aleatoriamente
+                const size = Math.random();
+                if (size < 0.6) {
+                    star.classList.add('small');
+                } else if (size < 0.9) {
+                    star.classList.add('medium');
+                } else {
+                    star.classList.add('large');
+                }
+                
+                // Posición aleatoria
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                
+                // Delay aleatorio para la animación
+                star.style.animationDelay = Math.random() * 3 + 's';
+                
+                starsContainer.appendChild(star);
+            }
+            
+            // Crear estrellas brillantes especiales
+            for (let i = 0; i < 20; i++) {
+                const brightStar = document.createElement('div');
+                brightStar.className = 'bright-star';
+                
+                // Posición aleatoria
+                brightStar.style.left = Math.random() * 100 + '%';
+                brightStar.style.top = Math.random() * 100 + '%';
+                
+                // Delay aleatorio para la animación
+                brightStar.style.animationDelay = Math.random() * 6 + 's';
+                
+                starsContainer.appendChild(brightStar);
+            }
+        }
+        
+        // Función para crear meteoros ocasionales
+        function createMeteor() {
+            const meteor = document.createElement('div');
+            meteor.className = 'meteor';
+            
+            // Posición inicial aleatoria en el borde superior izquierdo
+            meteor.style.left = Math.random() * 100 + '%';
+            meteor.style.top = '-10px';
+            
+            // Agregar al contenedor de estrellas
+            document.getElementById('starsContainer').appendChild(meteor);
+            
+            // Animar el meteoro
+            meteor.style.animation = 'meteorFall 3s linear forwards';
+            
+            // Remover el meteoro después de la animación
+            setTimeout(() => {
+                if (meteor.parentNode) {
+                    meteor.parentNode.removeChild(meteor);
+                }
+            }, 3000);
+        }
+        
+        // Función para regenerar estrellas periódicamente
+        function refreshStars() {
+            // Crear nuevas estrellas ocasionalmente para efecto dinámico
+            const stars = document.querySelectorAll('.star, .bright-star');
+            stars.forEach(star => {
+                if (Math.random() < 0.1) { // 10% de probabilidad
+                    star.style.animationDelay = '0s';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Crear el campo de estrellas inicial
+            createStarField();
+            
+            // Crear meteoros ocasionales
+            setInterval(createMeteor, 15000); // Cada 15 segundos
+            
+            // Refrescar estrellas ocasionalmente
+            setInterval(refreshStars, 5000); // Cada 5 segundos
+            
+            // Recrear estrellas completamente cada 2 minutos para variedad
+            setInterval(createStarField, 120000);
+
+            const targetUrlInput = document.getElementById('targetUrl');
+            const linkTitleInput = document.getElementById('linkTitle');
+            const generateBtn = document.getElementById('generateBtn');
+            const outputArea = document.getElementById('outputArea');
+            const iconOptions = document.querySelectorAll('.icon-option');
+            
+            let selectedIconStyle = 'web'; // Estilo por defecto
+            let selectedIconSVG = iconOptions[1].querySelector('svg').outerHTML; // SVG del estilo por defecto
+
+            // Manejar selección de icono
+            iconOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    iconOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedIconStyle = this.dataset.style;
+                    selectedIconSVG = this.querySelector('svg').outerHTML;
+                });
+            });
+
+            // Generar icono
+            generateBtn.addEventListener('click', function() {
+                const url = targetUrlInput.value.trim();
+                const title = linkTitleInput.value.trim();
+
+                if (!url) {
+                    alert('Por favor, ingresa una URL de destino.');
+                    targetUrlInput.focus();
+                    return;
+                }
+
+                try {
+                    new URL(url); // Validar formato básico de URL
+                } catch (_) {
+                    alert('Por favor, ingresa una URL válida (ej: https://www.ejemplo.com).');
+                    targetUrlInput.focus();
+                    return;
+                }
+
+                // Limpiar área de salida
+                outputArea.innerHTML = '';
+
+                // Crear el enlace-icono
+                const iconLink = document.createElement('a');
+                iconLink.href = url;
+                iconLink.classList.add('generated-icon-link');
+                iconLink.classList.add(`icon-style-${selectedIconStyle}`);
+                
+                if (title) {
+                    iconLink.title = title;
+                }
+                iconLink.target = '_blank';
+                iconLink.rel = 'noopener noreferrer';
+
+                // Añadir el SVG seleccionado
+                iconLink.innerHTML = selectedIconSVG;
+                
+                outputArea.appendChild(iconLink);
+
+                // Mostrar mensaje de éxito
+                const successMsg = document.createElement('div');
+                successMsg.style.cssText = `
+                    background: rgba(76, 175, 80, 0.1);
+                    border: 1px solid rgba(76, 175, 80, 0.3);
+                    color: #2e7d32;
+                    padding: 10px;
+                    border-radius: 6px;
+                    margin-top: 10px;
+                    text-align: center;
+                    font-size: 0.9em;
+                `;
+                successMsg.textContent = '✅ ¡Icono generado exitosamente! Haz clic para probar.';
+                outputArea.appendChild(successMsg);
+
+                // Remover mensaje después de 3 segundos
+                setTimeout(() => {
+                    if (successMsg.parentNode) {
+                        successMsg.remove();
+                    }
+                }, 3000);
+            });
+        });
+    </script>
+
+</body>
+</html>
