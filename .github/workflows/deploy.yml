@@ -1,8 +1,9 @@
-name: Deploy Axon
+name: Deploy Axon to GitHub Pages
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
     paths-ignore:
       - 'README.md'
       - 'GITHUB_PAGES.md'
@@ -18,54 +19,20 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Deploy to GitHub Pages
-        run: |
-          echo "🚀 Starting deployment..."
-          
-          # Clone the repository
-          git clone https://github.com/${{ github.repository }}.git repo
-          cd repo
-          
-          echo "📁 Repository cloned successfully"
-          
-          # Create deployment directory
-          mkdir -p ../site
-          
-          # Copy static files
-          echo "📋 Copying files..."
-          cp index.html ../site/
-          [ -d public ] && cp -r public ../site/ || echo "ℹ️ No public directory found"
-          [ -f _config.yml ] && cp _config.yml ../site/ || echo "ℹ️ No Jekyll config found"
-          
-          # Create or switch to gh-pages branch
-          echo "🌿 Setting up gh-pages branch..."
-          git fetch origin gh-pages 2>/dev/null || echo "ℹ️ gh-pages branch doesn't exist yet"
-          git checkout gh-pages 2>/dev/null || git checkout --orphan gh-pages
-          
-          # Clear existing content
-          echo "🧹 Clearing old content..."
-          rm -rf * .*
-          
-          # Copy new content
-          echo "📦 Deploying new content..."
-          cp -r ../site/* .
-          
-          # Configure git
-          git config user.name "GitHub Actions Bot"
-          git config user.email "actions@github.com"
-          
-          # Add all files
-          git add -A
-          
-          # Check if there are changes to commit
-          if git diff --staged --quiet; then
-            echo "✅ No changes to deploy"
-          else
-            # Commit and push
-            git commit -m "🚀 Deploy from main branch - $(date)"
-            echo "📤 Pushing to gh-pages..."
-            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages
-            echo "✅ Deployment completed successfully!"
-          fi
-          
-          echo "🌐 Site will be available at: https://${{ github.repository_owner }}.github.io/axon/"
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
+          # The following files and directories will be excluded from the deployment
+          exclude_assets: |
+            .github/
+            README.md
+            GITHUB_PAGES.md
+            server.js
+            database/
+            scripts/
+            node_modules/
